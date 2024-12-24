@@ -287,22 +287,29 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
+    if limit < 0:
+        return limit + 1
+    if typed == '': # Base cases should go here, you may add more base cases as needed.
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return len(source)
+    if source == '':
+        return len(typed)
         # END
     # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
+    if typed[0] == source[0]: # Feel free to remove or add additional cases
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return minimum_mewtations(typed[1:], source[1:], limit) 
         # END
     else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
+        # Fill in these lines
+        add = 1 + minimum_mewtations(typed, source[1:], limit - 1) 
+        remove = 1 + minimum_mewtations(typed[1:], source, limit - 1) 
+        substitute = 1 + minimum_mewtations(typed[1:], source[1:], limit - 1) 
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return min(add, remove, substitute)
         # END
 
 
@@ -349,6 +356,18 @@ def report_progress(typed, source, user_id, upload):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def count(typed, source):
+        if typed == [] or source == []:
+            return 0
+        if typed[0] != source[0]:
+            return 0
+        else: 
+            return 1 + count(typed[1:], source[1:])
+
+    progress = count(typed, source) / len(source)
+    d = {'id': user_id, 'progress': progress}
+    upload(d)
+    return progress
     # END PROBLEM 8
 
 
@@ -372,7 +391,7 @@ def time_per_word(words, timestamps_per_player):
     """
     tpp = timestamps_per_player  # A shorter name (for convenience)
     # BEGIN PROBLEM 9
-    times = []  # You may remove this line
+    times = [[tpp[i][j + 1] - tpp[i][j] for j in range(len(tpp[i]) - 1)] for i in range(len(tpp))]
     # END PROBLEM 9
     return {'words': words, 'times': times}
 
@@ -400,6 +419,17 @@ def fastest_words(words_and_times):
     word_indices = range(len(words))    # contains an *index* for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
+    res = [[] for _ in player_indices]
+    for i in word_indices:
+        min_player_index, min_player_time = -1, float('inf')
+        for j in player_indices:
+            player_time = get_time(times, j, i)
+            if player_time < min_player_time:
+                min_player_index, min_player_time = j, player_time
+            else:
+                continue
+        res[min_player_index].append(words[i])
+    return res
     # END PROBLEM 10
 
 
@@ -425,7 +455,7 @@ def get_time(times, player_num, word_index):
     return times[player_num][word_index]
 
 
-enable_multiplayer = False  # Change to True when you're ready to race.
+enable_multiplayer = True  # Change to True when you're ready to race.
 
 ##########################
 # Command Line Interface #
